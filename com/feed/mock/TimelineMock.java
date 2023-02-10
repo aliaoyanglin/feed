@@ -47,8 +47,8 @@ public class TimelineMock {
         graphTimelineService.setTimelineCache(timelineCache);
 
         //function
-//        timelineMock.getUserTimeline();
-        timelineMock.getGraphTimeline();
+//        timelineMock.getUserTimeline();//success
+//        timelineMock.getGraphTimeline();//success
     }
 
     public TimelineService buildUserTimelineService(){

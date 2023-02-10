@@ -25,7 +25,7 @@ public class UserMock {
         userService.setCache(userCache);
 
         //user function check
-        mock.createUsers(); //success!
+//        mock.createUsers(); //success!
 //        mock.getUsers(getUsersLong(10200L, 10400L));//success!
 //        mock.deleteUsers(); //success!
 //        mock.getAllUsers(getUsersList(10200L, 10400L));//success!

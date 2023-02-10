@@ -27,6 +27,7 @@ public class ContentMock {
     private String contentMcHost = "10.226.52.80";
     private int contentMcPort = 11211;
     private String contentDb = "root";
+
     private ContentService contentService;
 
     public String getContentMcHost() {
@@ -56,8 +57,8 @@ public class ContentMock {
 
         //content function test
 
-        contentMock.addContent();//success
-//        contentMock.getAllContent();//success
+//        contentMock.addContent();//success
+        contentMock.getAllContent();//success
 //        contentMock.deleteContent();//success
 //        contentMock.forwardContent();//success
     }
@@ -103,7 +104,7 @@ public class ContentMock {
     }
 
     public void getAllContent(){
-        for(int i = 40001;i<40945;i++) {
+        for(int i = 0;i<40945;i++) {
             Content content = contentService.getContent(i);
             System.out.println(content.toJason(content));
         }

@@ -14,41 +14,44 @@ import java.util.List;
  */
 public class FollowingGraphDaoImpl implements FollowingGraphDao {
     // db client
-//    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-//    static final String DB_URL = "jdbc:mysql://localhost:3306/" +
-//            "feedsys?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-//
-//    private static final String dbUser = "root";
-//    private static final String dbPass = "02@violetc1210";
-    private List<Connection> dbConnections = null;
-    private int tablesPerDB;
-    private Statement statement = null;
+    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/" +
+            "feedsys?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
 
-    public FollowingGraphDaoImpl(int tablesPerDB, List<Connection> dbConnections) {
-        this.tablesPerDB = tablesPerDB;
-        this.dbConnections = dbConnections;
-    }
+    private static final String dbUser = "root";
+    private static final String dbPass = "02@violetc1210";
+//    private List<Connection> dbConnections = null;
+//    private int tablesPerDB;
+    private Statement statement = null;
+    private Connection connection = null;
+
+//    public FollowingGraphDaoImpl(int tablesPerDB, List<Connection> dbConnections) {
+//        this.tablesPerDB = tablesPerDB;
+//        this.dbConnections = dbConnections;
+//
+//    }
+
+    public FollowingGraphDaoImpl() {}
 
     @Override
     public void addFollowing(Friend friend) {
         try {
-//            Class.forName(JDBC_DRIVER);
-//
-//            //start connecting to feedsys.
-//            System.out.println("connect to feedsys!");
-//            connection = DriverManager.getConnection(DB_URL, dbUser, dbPass);
-            int allTablesCount = this.tablesPerDB * this.dbConnections.size();
-            int tableIdx = (int)(friend.getUid() % allTablesCount);
-            int dbIdx = tableIdx / this.dbConnections.size();
+//            int allTablesCount = this.tablesPerDB * this.dbConnections.size();
+//            int tableIdx = (int)(friend.getUid() % allTablesCount);
+//            int dbIdx = tableIdx / this.dbConnections.size();
+
+            Class.forName(JDBC_DRIVER);
 
             System.out.println("add a following!");
-            Connection connection = this.dbConnections.get(dbIdx);
+//            Connection connection = this.dbConnections.get(dbIdx);
+            connection = DriverManager.getConnection(DB_URL, dbUser, dbPass);
             statement = connection.createStatement();
             String sql;
             for (int i = 0; friend.getAttention() != null && i < friend.getAttention().size(); i++) {
-                sql = "INSERT INTO following VALUES (?, ?, ?)";
-//                sql = "INSERT INTO following VALUES ('" + friend.getAttention().get(i).getUid() + "', '" + friend.getUid() + "', '" + friend.getAttention().get(i).getCreated() + "')";
-                PreparedStatement preparedStatement = connection.pre
+//                sql = "INSERT INTO following VALUES (?, ?, ?)";
+                sql = "INSERT INTO following VALUES ('" + friend.getAttention().get(i).getUid() + "', '"
+                        + friend.getUid() + "', '" + friend.getAttention().get(i).getCreated() + "')";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.executeUpdate();
             }
 
@@ -83,7 +86,6 @@ public class FollowingGraphDaoImpl implements FollowingGraphDao {
 
             System.out.println("increase users!");
             statement = connection.createStatement();
-
             String sql;
             for (int i = 0; friend.getAttention() != null && i < friend.getAttention().size(); i++) {
                 sql = "DELETE FROM following WHERE from_uid='" + friend.getAttention().get(i).getUid() + "' and to_uid='" + friend.getUid() + "'";

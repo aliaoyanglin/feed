@@ -9,7 +9,6 @@ import com.feed.dao.impl.FriendGraphDaoImpl;
 import com.feed.model.Attention;
 import com.feed.model.Friend;
 import com.feed.service.GraphService;
-import com.feed.service.UserService;
 import com.feed.service.impl.GraphServiceImpl;
 
 import java.sql.Timestamp;
@@ -19,7 +18,12 @@ import java.util.List;
 public class GraphMock {
     private String graphMcHost = "10.226.52.80";
     private int graphMcPort = 11211;
-    private String graphDb = "root";
+    static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/" +
+            "feedsys?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String dbUser = "root";
+    private static final String dbPass = "02@violetc1210";
+
     private GraphService graphService;
 
     public static void main(String[] args) {
@@ -31,8 +35,8 @@ public class GraphMock {
 
         //graph function check
 //        graphMock.addFriend();//success
-        graphMock.getFriend();//success
-        graphMock.getFollowing();//success
+//        graphMock.getFriend();//success
+//        graphMock.getFollowing();//success
 //        graphMock.deleteFriend();//success
 
     }
@@ -43,10 +47,6 @@ public class GraphMock {
 
     public int getGraphMcPort() {
         return graphMcPort;
-    }
-
-    public String getGraphDb() {
-        return graphDb;
     }
 
     public GraphService getGraphService() {
