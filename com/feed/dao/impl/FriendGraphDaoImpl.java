@@ -22,7 +22,7 @@ public class FriendGraphDaoImpl implements FriendGraphDao {
     @Override
     public void addFriend(Friend friend) {
         try {
-            Class.forName(JDBC_DRIVER);
+//            Class.forName(JDBC_DRIVER);
 
             //start connecting to feedsys.
             System.out.println("connect to feedsys!");
@@ -38,7 +38,7 @@ public class FriendGraphDaoImpl implements FriendGraphDao {
             }
 
             statement.close();
-            connection.close();
+//            connection.close();
 
         } catch (SQLException sqlE1) {
             sqlE1.printStackTrace();
@@ -55,6 +55,7 @@ public class FriendGraphDaoImpl implements FriendGraphDao {
         } catch (SQLException sqlE) {
             sqlE.printStackTrace();
         }
+        System.out.println("after addFri:"+friend.toJason());
     }
 
     @Override

@@ -64,8 +64,13 @@ public class Attention {
         return 1;
     }
 
-    public String toJason(Attention attention){return JSON.toJSONString(attention);}
+    public String toJason(){return JSON.toJSONString(this);}
 
     public Attention parseJason(String attentionJason){return JSON.parseObject(attentionJason, Attention.class);}
+
+    @Override
+    public String toString() {
+        return this.toJason();
+    }
 }
 

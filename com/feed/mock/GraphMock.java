@@ -11,34 +11,80 @@ import com.feed.model.Friend;
 import com.feed.service.GraphService;
 import com.feed.service.impl.GraphServiceImpl;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GraphMock {
-    private String graphMcHost = "10.226.52.80";
-    private int graphMcPort = 11211;
+    private final String graphMcHost = "10.226.52.80";
+    private final int graphMcPort = 11211;
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/" +
-            "feedsys?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String dbUser = "root";
-    private static final String dbPass = "02@violetc1210";
+    static final String DB_URL0 = "jdbc:mysql://localhost:3306/" + "feedsys?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL1 = "jdbc:mysql://localhost:3306/" + "follow_0?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL2 = "jdbc:mysql://localhost:3306/" + "follow_1?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL3 = "jdbc:mysql://localhost:3306/" + "follow_2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL4 = "jdbc:mysql://localhost:3306/" + "follow_3?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL5 = "jdbc:mysql://localhost:3306/" + "fri_0?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    static final String DB_URL6 = "jdbc:mysql://localhost:3306/" + "fri_1?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private final String dbUser = "root";
+    private final String dbPass = "02@violetc1210";
+    private final int tablesPerDbFol = 2;
+    private int tablesPerDbFri = 4;
+    private List<Connection> dbConnectionsFol = new ArrayList<>();
+    private List<Connection> dbConnectionsFri = new ArrayList<>();
 
     private GraphService graphService;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         GraphMock graphMock = new GraphMock();
         GraphService graphService = graphMock.buildService();
         GraphCache graphCache = graphMock.buildCache(graphMock.getGraphMcHost(), graphMock.getGraphMcPort());
+        FollowingGraphDao followingGraphDao = graphMock.buildFollowingGraphDao(JDBC_DRIVER, graphMock.getTablesPerDbFol(), graphMock.getDbConnectionsFol());
+//        FriendGraphDao friendGraphDao = graphMock.buildFriendGraphDao(JDBC_DRIVER, graphMock.getTablesPerDbFol(), graphMock.dbConnectionsFol);
         graphMock.setGraphService(graphService);
         graphService.setGraphCache(graphCache);
+        graphService.setFollowingGraphDao(followingGraphDao);
 
         //graph function check
-//        graphMock.addFriend();//success
+        graphMock.addFriend();//success
 //        graphMock.getFriend();//success
 //        graphMock.getFollowing();//success
 //        graphMock.deleteFriend();//success
 
+    }
+
+    public int getTablesPerDbFol() {
+        return 2;
+    }
+
+    public int getTablesPerDbFri() {
+        return tablesPerDbFri;
+    }
+
+    public String getDbUser() {
+        return dbUser;
+    }
+
+    public String getDbPass() {
+        return dbPass;
+    }
+
+    public List<Connection> getDbConnectionsFol() throws SQLException {
+        List<Connection> dbConnectionsFol = new ArrayList<>();
+        try {
+            Class.forName(JDBC_DRIVER);
+            dbConnectionsFol.add(DriverManager.getConnection(DB_URL1, dbUser, dbPass));
+            dbConnectionsFol.add(DriverManager.getConnection(DB_URL2, dbUser, dbPass));
+            dbConnectionsFol.add(DriverManager.getConnection(DB_URL3, dbUser, dbPass));
+            dbConnectionsFol.add(DriverManager.getConnection(DB_URL4, dbUser, dbPass));
+            this.dbConnectionsFol = dbConnectionsFol;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return dbConnectionsFol;
     }
 
     public String getGraphMcHost() {
@@ -69,37 +115,57 @@ public class GraphMock {
         return new GraphCacheImpl(graphMcHost, graphMcPort);
     }
 
+    public FollowingGraphDao buildFollowingGraphDao(String JDBC_DRIVER, int tablesPerDB, List<Connection> dbConnections){
+        return new FollowingGraphDaoImpl(JDBC_DRIVER, tablesPerDbFol, dbConnectionsFol);
+    }
+//    public FollowingGraphDao buildFriendGraphDao(String JDBC_DRIVER, int tablesPerDB, List<Connection> dbConnections){
+//        return new FriendGraphDaoImpl(JDBC_DRIVER, tablesPerDbFri, dbConnectionsFri);
+//    }
+
     public void setGraphService(GraphService graphService){
         this.graphService = graphService;
     }
 
     //function
-    public void addFriend(){
-        for(long id = 10200;id<10400;id++) {
-            for(long uid = id+1;uid<10400;uid+=20) {
-                List<Attention> attentionList = new ArrayList<>();
+    public void addFriend() {
+        int startUid = 10201;
+        int endUid = 10300;
+        int endFriUid = endUid;
+        int step = 1;
+        System.out.println("Add friend...");
+        for (long uid = startUid; uid < endUid; uid++) {
+            List<Attention> attentionList = new ArrayList<>();
+            for (long friUid = uid + 1; friUid < endFriUid; friUid += step) {
                 Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                Attention attention = new Attention(uid, timestamp);
+                Attention attention = new Attention(friUid, timestamp);
                 attentionList.add(attention);
-                Friend friend = new Friend(id, attentionList);
-                graphService.addFriend(friend);
-                graphService.addFollowing(friend);
+                System.out.println("build:"+uid+"---"+friUid);
             }
+            System.out.println("after build:"+uid+"---"+attentionList);
+            Friend friend = new Friend(uid, attentionList);
+            System.out.println("2 build:"+uid+"---"+attentionList);
+            graphService.addFriend(friend);
+            System.out.println("3 build:"+uid+"---"+attentionList);
+            System.out.println("will add following:"+friend.toJason());
+            graphService.addFollowing(friend);
+
         }
     }
+
 
     public void getFriend(){
         long uid = 10220;
         List<Attention> attentionList = graphService.getFriends(uid);
         for(Attention attention : attentionList) {
-            System.out.println("uid:"+uid+" friendId:"+attention.toJason(attention));
+            System.out.println("uid:"+uid+" friendId:"+attention.toJason());
         }
     }
+
     public void getFollowing(){
         long uid = 10241;
         List<Attention> attentionList = graphService.getFollowings(uid);
         for(Attention attention : attentionList) {
-            System.out.println("uid:"+uid+" followingId:"+attention.toJason(attention));
+            System.out.println("uid:"+uid+" followingId:"+attention.toJason());
         }
     }
 

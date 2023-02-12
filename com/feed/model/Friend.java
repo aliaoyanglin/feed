@@ -34,8 +34,8 @@ public class Friend {
         this.attentionList = attentionList;
     }
 
-    public String toJason(Friend friend){
-        return JSON.toJSONString(friend);
+    public String toJason(){
+        return JSON.toJSONString(this);
     }
 
     public static Friend parseJason(String userJason){

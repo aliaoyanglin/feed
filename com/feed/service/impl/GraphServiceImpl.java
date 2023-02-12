@@ -49,6 +49,7 @@ public class GraphServiceImpl implements GraphService {
         followingGraphDao.addFollowing(friend);
 
         //add to cache此时不向cache中存入，在下次读取时再存入，以保证数据的一致性
+        //原因是此时的key为从friend.getUid()存入的from_uid,而实际上要存入的key为to_uid.
 //        graphCache.addFriend(friend);
     }
 

@@ -34,17 +34,22 @@ public class GraphCacheImpl implements GraphCache {
         if (getFriends(friend.getUid()) != null) {
             //取出mc里的数据，准备合并
             Friend friendMc = getFriends(friend.getUid());
-            List<Attention> friendSwap = friend.getAttention();//创建一个新的List，用于存储,合并和去重
-            friendSwap.addAll(friendMc.getAttention());
+//            List<Attention> friendSwap = friend.getAttention();//创建一个新的List，用于存储,合并和去重
+//            friendSwap.addAll(friendMc.getAttention());
             //合并完成后进行去重，提前在Attention中进行@override equals()方法
+            for(Attention att : friend.getAttention()){
+                if(!friendMc.getAttention().contains(att.getUid())){
+                    friendMc.getAttention().add(att);
+                }
+            }
 
 
-            friendMc.setAttention(friendSwap.stream().distinct().collect(Collectors.toList()));
+//            friendMc.setAttention(friendSwap.stream().distinct().collect(Collectors.toList()));
 
-            mcc.set("friend" + friend.getUid() + "", 3600, friendMc.toJason(friendMc));
+            mcc.set("friend" + friend.getUid() + "", 3600, friendMc.toJason());
         }
         if(getFriends(friend.getUid()) == null){
-            mcc.set("friend"+ friend.getUid() +"", 3600,friend.toJason(friend));
+            mcc.set("friend"+ friend.getUid() +"", 3600,friend.toJason());
         }
     }
 
@@ -60,7 +65,7 @@ public class GraphCacheImpl implements GraphCache {
                         friendSwap.remove(i);
             friendMc.setAttention(friendSwap);
 
-            mcc.set("friend" + friend.getUid() + "", 3600, friendMc.toJason(friendMc));
+            mcc.set("friend" + friend.getUid() + "", 3600, friendMc.toJason());
         }
     }
 
@@ -81,10 +86,10 @@ public class GraphCacheImpl implements GraphCache {
             //合并完成后进行去重，提前在Attention中进行@override equals() hashset()方法
             friendMc.setAttention(friendSwap.stream().distinct().collect(Collectors.toList()));
 
-            mcc.set("following" + friend.getUid() + "", 3600, friendMc.toJason(friendMc));
+            mcc.set("following" + friend.getUid() + "", 3600, friendMc.toJason());
         }
         if(getFriends(friend.getUid()) == null){
-            mcc.set("following"+ friend.getUid() +"", 3600,friend.toJason(friend));
+            mcc.set("following"+ friend.getUid() +"", 3600,friend.toJason());
         }
     }
 
@@ -103,7 +108,7 @@ public class GraphCacheImpl implements GraphCache {
                 friendSwap.removeAll(friend1.getAttention());
 
                 friendMc.setAttention(friendSwap);
-                mcc.set("following" + friend.getUid() + "", 3600, friendMc.toJason(friendMc));
+                mcc.set("following" + friend.getUid() + "", 3600, friendMc.toJason());
             }
         }
     }
